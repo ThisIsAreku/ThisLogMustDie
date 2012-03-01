@@ -13,9 +13,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import alexoft.tlmd.filters.ExactFilter;
+import alexoft.tlmd.filters.LevelFilter;
+import alexoft.tlmd.filters.LoggerFilter;
+import alexoft.tlmd.filters.RegexFilter;
 
 public class Main extends JavaPlugin {
 	public static Logger l;
@@ -57,13 +61,20 @@ public class Main extends JavaPlugin {
 		p_version = this.getDescription().getVersion();
 		this.masterFilter = new MasterFilter();
 		loadConfig();
-		this.getServer().getLogger().setFilter(this.masterFilter);
+		loadMasterFilter();
 	}
 
 	public void Disable() {
 		this.getPluginLoader().disablePlugin(this);
 		this.setEnabled(false);
 		return;
+	}
+	
+	public void loadMasterFilter(){
+		for(Plugin p : this.getServer().getPluginManager().getPlugins()){
+			p.getLogger().setFilter(this.masterFilter);
+		}
+		this.getServer().getLogger().setFilter(this.masterFilter);
 	}
 
 	public void loadConfig() {
@@ -76,10 +87,10 @@ public class Main extends JavaPlugin {
 
 			this.getConfig().load(file);
 
-			List<Map<String, Object>> filtersMS = this.getConfig().getMapList(
+			List<Map<?,?>> filtersMS = this.getConfig().getMapList(
 					"filters");
 			int i=0;
-			for (Map<String, Object> m : filtersMS) {
+			for (Map<?, ?> m : filtersMS) {
 				i++;
 				if(!(m.containsKey("type") && m.containsKey("expression"))) {
 					log("Filter no." + i + " ignored");
@@ -98,8 +109,17 @@ public class Main extends JavaPlugin {
 					this.masterFilter.addFilter(new ExactFilter(expression, caseSensitive));
 					
 				} else if ("RegexFilter".equalsIgnoreCase(type)) {
-
+					this.masterFilter.addFilter(new RegexFilter(expression));
+					
 				} else if ("LevelFilter".equalsIgnoreCase(type)) {
+					this.masterFilter.addFilter(new LevelFilter(expression));
+
+				} else if ("LoggerFilter".equalsIgnoreCase(type)) {
+					boolean caseSensitive = false;
+					if(m.containsKey("case-sensitive")){
+						caseSensitive = Boolean.parseBoolean(m.get("case-sensitive").toString());
+					}
+					this.masterFilter.addFilter(new LoggerFilter(expression, caseSensitive));
 
 				}else{
 					log("Filter no." + i + " has incorrect type");
