@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Filter;
@@ -60,23 +61,47 @@ public class Main extends JavaPlugin {
 		this.setEnabled(false);
 		return;
 	}
-    
-    public void startMetrics(){
 
-        try {
-            log("Starting Metrics");
-            Metrics metrics = new Metrics();
-            metrics.beginMeasuringPlugin(this);
-        } catch (IOException e) {
-            log("Cannot start Metrics...");
-        }
-    }
-	
-	public void loadMasterFilter(){
-		for(Plugin p : this.getServer().getPluginManager().getPlugins()){
-			p.getLogger().setFilter(this.masterFilter);
+	public void startMetrics() {
+
+		try {
+			log("Starting Metrics");
+			Metrics metrics = new Metrics();
+			metrics.beginMeasuringPlugin(this);
+		} catch (IOException e) {
+			log("Cannot start Metrics...");
 		}
-		this.getServer().getLogger().setFilter(this.masterFilter);
+	}
+
+	public void loadMasterFilter() {
+		final List<Plugin> notLoaded = new ArrayList<Plugin>();
+		int i = 0;
+		try {
+			for (Plugin p : this.getServer().getPluginManager().getPlugins()) {
+				p.getLogger().setFilter(this.masterFilter);
+				i++;
+			}
+			getServer().getLogger().setFilter(masterFilter);
+		} catch (Exception e) {
+			notLoaded.add(this.getServer().getPluginManager().getPlugins()[i]);
+		}
+
+		this.getServer().getScheduler()
+				.scheduleSyncDelayedTask(this, new Runnable() {
+					@Override
+					public void run() {
+						String pname = "";
+						try {
+							for (Plugin p : notLoaded) {
+								pname = p.toString();
+								p.getLogger().setFilter(masterFilter);
+							}
+						} catch (Exception e) {
+							log(Level.WARNING, "Cannot load filter in '" + pname +"'. The logs of this plugin will not be filtered");
+						}
+
+					}
+				});
 	}
 
 	public void loadConfig() {
@@ -85,29 +110,29 @@ public class Main extends JavaPlugin {
 			if (!this.getDataFolder().exists())
 				this.getDataFolder().mkdirs();
 			if (!file.exists())
-				copy(this.getResource("filters.yml"),file);
+				copy(this.getResource("filters.yml"), file);
 
 			this.getConfig().load(file);
 
-			List<Map<?,?>> filtersMS = this.getConfig().getMapList(
-					"filters");
-			int i=0;
+			List<Map<?, ?>> filtersMS = this.getConfig().getMapList("filters");
+			int i = 0;
 			for (Map<?, ?> m : filtersMS) {
 				i++;
-				if(!(m.containsKey("type") && m.containsKey("expression"))) {
+				if (!(m.containsKey("type") && m.containsKey("expression"))) {
 					log("Filter no." + i + " ignored");
 					continue;
 				}
 				String type = m.get("type").toString();
 				String expression = m.get("expression").toString();
-				try{
-					TlmdFilter filter  = (TlmdFilter) Class.forName("alexoft.tlmd.filters." + type).newInstance();
+				try {
+					TlmdFilter filter = (TlmdFilter) Class.forName(
+							"alexoft.tlmd.filters." + type).newInstance();
 					filter.initialize(expression, m);
 					this.masterFilter.addFilter((Filter) filter);
-				}catch(ClassNotFoundException e){
+				} catch (ClassNotFoundException e) {
 					log("Filter no." + i + " has incorrect type !");
 				} catch (Exception e) {
-					logException(e,"Filter type:" + type);
+					logException(e, "Filter type:" + type);
 				}
 			}
 			log(this.masterFilter.filterCount() + " filter(s) loaded");
@@ -126,17 +151,18 @@ public class Main extends JavaPlugin {
 			return;
 		}
 	}
-	private void copy(InputStream src, File dst) throws IOException {
-	    OutputStream out = new FileOutputStream(dst);
 
-	    // Transfer bytes from in to out
-	    byte[] buf = new byte[1024];
-	    int len;
-	    while ((len = src.read(buf)) > 0) {
-	        out.write(buf, 0, len);
-	    }
-	    src.close();
-	    out.close();
+	private void copy(InputStream src, File dst) throws IOException {
+		OutputStream out = new FileOutputStream(dst);
+
+		// Transfer bytes from in to out
+		byte[] buf = new byte[1024];
+		int len;
+		while ((len = src.read(buf)) > 0) {
+			out.write(buf, 0, len);
+		}
+		src.close();
+		out.close();
 	}
 
 }
