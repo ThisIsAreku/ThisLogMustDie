@@ -6,20 +6,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import alexoft.tlmd.filters.ExactFilter;
-import alexoft.tlmd.filters.LevelFilter;
-import alexoft.tlmd.filters.LoggerFilter;
-import alexoft.tlmd.filters.RegexFilter;
 
 public class Main extends JavaPlugin {
 	public static Logger l;
@@ -42,11 +37,6 @@ public class Main extends JavaPlugin {
 		log(Level.SEVERE, "ThisLogMustDie! version " + p_version);
 		log(Level.SEVERE, "Bukkit version " + b_version);
 		log(Level.SEVERE, "Message: " + m);
-		if (e instanceof SQLException) {
-			log(Level.SEVERE, "SQLState: " + ((SQLException) e).getSQLState());
-			log(Level.SEVERE,
-					"Error Code: " + ((SQLException) e).getErrorCode());
-		}
 		log(Level.SEVERE, e.toString() + " : " + e.getLocalizedMessage());
 		for (StackTraceElement t : e.getStackTrace()) {
 			log(Level.SEVERE, "\t" + t.toString());
@@ -62,6 +52,7 @@ public class Main extends JavaPlugin {
 		this.masterFilter = new MasterFilter();
 		loadConfig();
 		loadMasterFilter();
+		startMetrics();
 	}
 
 	public void Disable() {
@@ -69,6 +60,17 @@ public class Main extends JavaPlugin {
 		this.setEnabled(false);
 		return;
 	}
+    
+    public void startMetrics(){
+
+        try {
+            log("Starting Metrics");
+            Metrics metrics = new Metrics();
+            metrics.beginMeasuringPlugin(this);
+        } catch (IOException e) {
+            log("Cannot start Metrics...");
+        }
+    }
 	
 	public void loadMasterFilter(){
 		for(Plugin p : this.getServer().getPluginManager().getPlugins()){
@@ -96,33 +98,16 @@ public class Main extends JavaPlugin {
 					log("Filter no." + i + " ignored");
 					continue;
 				}
-				/*for(Entry<String,Object> e : m.entrySet()){
-					log(e.getKey() + "=>" + e.getValue());
-				}*/
 				String type = m.get("type").toString();
 				String expression = m.get("expression").toString();
-				if ("ExactFilter".equalsIgnoreCase(type)) {
-					boolean caseSensitive = false;
-					if(m.containsKey("case-sensitive")){
-						caseSensitive = Boolean.parseBoolean(m.get("case-sensitive").toString());
-					}
-					this.masterFilter.addFilter(new ExactFilter(expression, caseSensitive));
-					
-				} else if ("RegexFilter".equalsIgnoreCase(type)) {
-					this.masterFilter.addFilter(new RegexFilter(expression));
-					
-				} else if ("LevelFilter".equalsIgnoreCase(type)) {
-					this.masterFilter.addFilter(new LevelFilter(expression));
-
-				} else if ("LoggerFilter".equalsIgnoreCase(type)) {
-					boolean caseSensitive = false;
-					if(m.containsKey("case-sensitive")){
-						caseSensitive = Boolean.parseBoolean(m.get("case-sensitive").toString());
-					}
-					this.masterFilter.addFilter(new LoggerFilter(expression, caseSensitive));
-
-				}else{
-					log("Filter no." + i + " has incorrect type");
+				try{
+					TlmdFilter filter  = (TlmdFilter) Class.forName("alexoft.tlmd.filters." + type).newInstance();
+					filter.initialize(expression, m);
+					this.masterFilter.addFilter((Filter) filter);
+				}catch(ClassNotFoundException e){
+					log("Filter no." + i + " has incorrect type !");
+				} catch (Exception e) {
+					logException(e,"Filter type:" + type);
 				}
 			}
 			log(this.masterFilter.filterCount() + " filter(s) loaded");

@@ -1,30 +1,37 @@
 package alexoft.tlmd.filters;
 
+import java.util.Map;
 import java.util.logging.Filter;
-import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-public class LoggerFilter implements Filter  {
-	private String expression;
+import alexoft.tlmd.TlmdFilter;
+
+public class LoggerFilter extends TlmdFilter  implements Filter  {
 	private boolean caseSensitive;
 
-	public LoggerFilter(String expression, boolean caseSensitive){
-		this.expression = expression;
-		this.caseSensitive = caseSensitive;
+	@Override
+	public void initialize(String expression, Map<?, ?> params) {
+		super.initialize(expression, params);
+		if(this.getParams().containsKey("case-sensitive")){
+			caseSensitive = Boolean.parseBoolean(this.getParams().get("case-sensitive").toString());
+		}
 	}
-	public LoggerFilter(String expression, boolean caseSensitive, Level l){
-		this.expression = expression;
-		this.caseSensitive = caseSensitive;
-	}
-
+	
 	@Override
 	public boolean isLoggable(LogRecord record) {
 		String m = record.getLoggerName();
 		if(this.caseSensitive){
-			return !m.equals(this.expression);
+			if(m.equals(this.getExpression())){
+				this.write(record);
+				return false;
+			}
 		}else{
-			return !m.equalsIgnoreCase(this.expression);			
+			if(m.equalsIgnoreCase(this.getExpression())){
+				this.write(record);
+				return false;
+			}		
 		}
+		return true;
 	}
 
 }

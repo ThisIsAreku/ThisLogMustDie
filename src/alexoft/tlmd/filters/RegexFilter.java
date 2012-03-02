@@ -1,23 +1,20 @@
 package alexoft.tlmd.filters;
 
 import java.util.logging.Filter;
-import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-public class RegexFilter implements Filter  {
-	private String expression;
+import alexoft.tlmd.TlmdFilter;
 
-	public RegexFilter(String expression){
-		this.expression = expression;
-	}
-	public RegexFilter(String expression, Level l){
-		this.expression = expression;
-	}
+public class RegexFilter extends TlmdFilter  implements Filter  {
 
 	@Override
 	public boolean isLoggable(LogRecord record) {
 		String m = record.getMessage();
-			return !m.matches(expression);
+		if(m.matches(this.getExpression())){
+			this.write(record);
+			return false;
+		}
+		return true;
 	}
 
 }

@@ -24,24 +24,28 @@ public class MasterFilter implements Filter {
 
 	@Override
 	public boolean isLoggable(LogRecord record) {
-		for (Filter f : this.filters) {
-			if (!f.isLoggable(record)) {
-				return false;
+		try {
+			for (Filter f : this.filters) {
+				if (!f.isLoggable(record)) {
+					return false;
+				}
 			}
+			return true;
+		} catch (Exception e) {
+			write(e.getMessage());
+			return true;
 		}
-		return true;
 	}
 
-	public void r(String m) {
+	public static void write(String message) {
 		try {
-			// Create file
-			FileWriter fstream = new FileWriter("out.txt", true);
+			FileWriter fstream = new FileWriter("tlmd.log", true);
 			BufferedWriter out = new BufferedWriter(fstream);
-			out.write(m+"\r\n");
-			// Close the output stream
+			out.write(message);
+			out.newLine();
 			out.close();
-		} catch (Exception e) {// Catch exception if any
-			System.err.println("Error: " + e.getMessage());
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }
