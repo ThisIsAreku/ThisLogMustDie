@@ -6,7 +6,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Filter;
@@ -74,34 +73,39 @@ public class Main extends JavaPlugin {
 	}
 
 	public void loadMasterFilter() {
-		final List<Plugin> notLoaded = new ArrayList<Plugin>();
-		int i = 0;
+		String pname = "";
 		try {
 			for (Plugin p : this.getServer().getPluginManager().getPlugins()) {
+				pname = p.toString();
 				p.getLogger().setFilter(this.masterFilter);
-				i++;
+				// i++;
 			}
-			getServer().getLogger().setFilter(masterFilter);
+			this.getServer().getLogger().setFilter(masterFilter);
 		} catch (Exception e) {
-			notLoaded.add(this.getServer().getPluginManager().getPlugins()[i]);
+			log(Level.INFO, "Cannot load filter in '" + pname
+					+ "'. Retrying later..");
 		}
-
 		this.getServer().getScheduler()
 				.scheduleSyncDelayedTask(this, new Runnable() {
 					@Override
 					public void run() {
 						String pname = "";
 						try {
-							for (Plugin p : notLoaded) {
+							for (Plugin p : getServer().getPluginManager()
+									.getPlugins()) {
 								pname = p.toString();
 								p.getLogger().setFilter(masterFilter);
 							}
+							getServer().getLogger().setFilter(masterFilter);
 						} catch (Exception e) {
-							log(Level.WARNING, "Cannot load filter in '" + pname +"'. The logs of this plugin will not be filtered");
+							log(Level.WARNING,
+									"Cannot load filter in '"
+											+ pname
+											+ "'. The logs of this plugin will not be filtered");
 						}
 
 					}
-				});
+				}, 1);
 	}
 
 	public void loadConfig() {

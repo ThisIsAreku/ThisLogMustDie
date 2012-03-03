@@ -19,7 +19,7 @@ public class ExactFilter extends TlmdFilter implements Filter  {
 
 	@Override
 	public boolean isLoggable(LogRecord record) {
-		String m = record.getMessage();
+		String m = record.getMessage().trim();
 		if(this.caseSensitive){
 			if(m.equals(this.getExpression())){
 				this.write(record);
