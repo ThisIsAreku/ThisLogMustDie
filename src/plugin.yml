@@ -1,6 +1,7 @@
 name: ThisLogMustDie
 main: alexoft.tlmd.Main
 author: ThisIsAreku
-version: 0.3.3
+website: http://alexoft.x10.mx/
+version: 0.3.4
 description: todo
 load: STARTUP
