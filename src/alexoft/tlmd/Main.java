@@ -49,11 +49,13 @@ public class Main extends JavaPlugin {
 		l = this.getLogger();
 		b_version = this.getServer().getVersion();
 		p_version = this.getDescription().getVersion();
-        log("ThisIsAreku present " + this.getDescription().getName().toUpperCase() + ", v" + p_version);
-        log("= " + this.getDescription().getWebsite() + " =");
-		this.masterFilter = new MasterFilter();
-		loadConfig();
-		loadMasterFilter();
+		log("ThisIsAreku present "
+				+ this.getDescription().getName().toUpperCase() + ", v"
+				+ p_version);
+		log("= " + this.getDescription().getWebsite() + " =");
+		this.masterFilter = new MasterFilter(this);
+		loadFilters();
+		initializeMasterFilter();
 		startMetrics();
 	}
 
@@ -67,14 +69,14 @@ public class Main extends JavaPlugin {
 
 		try {
 			log("Starting Metrics");
-			Metrics metrics = new Metrics();
-			metrics.beginMeasuringPlugin(this);
+			MetricsLite metrics = new MetricsLite(this);
+			metrics.start();
 		} catch (IOException e) {
 			log("Cannot start Metrics...");
 		}
 	}
 
-	public void loadMasterFilter() {
+	public void initializeMasterFilter() {
 		String pname = "";
 		try {
 			for (Plugin p : this.getServer().getPluginManager().getPlugins()) {
@@ -83,6 +85,7 @@ public class Main extends JavaPlugin {
 				// i++;
 			}
 			this.getServer().getLogger().setFilter(masterFilter);
+			Logger.getLogger("Minecraft").setFilter(masterFilter);
 		} catch (Exception e) {
 			log(Level.INFO, "Cannot load filter in '" + pname
 					+ "'. Retrying later..");
@@ -99,6 +102,8 @@ public class Main extends JavaPlugin {
 								p.getLogger().setFilter(masterFilter);
 							}
 							getServer().getLogger().setFilter(masterFilter);
+							Logger.getLogger("Minecraft").setFilter(
+									masterFilter);
 						} catch (Exception e) {
 							log(Level.WARNING,
 									"Cannot load filter in '"
@@ -110,7 +115,7 @@ public class Main extends JavaPlugin {
 				}, 1);
 	}
 
-	public void loadConfig() {
+	public void loadFilters() {
 		try {
 			File file = new File(this.getDataFolder(), "filters.yml");
 			if (!this.getDataFolder().exists())
@@ -121,6 +126,8 @@ public class Main extends JavaPlugin {
 			this.getConfig().load(file);
 
 			List<Map<?, ?>> filtersMS = this.getConfig().getMapList("filters");
+			
+			this.masterFilter.clearFilters();
 			int i = 0;
 			for (Map<?, ?> m : filtersMS) {
 				i++;
@@ -133,10 +140,14 @@ public class Main extends JavaPlugin {
 				try {
 					TlmdFilter filter = (TlmdFilter) Class.forName(
 							"alexoft.tlmd.filters." + type).newInstance();
-					filter.initialize(expression, m);
-					this.masterFilter.addFilter((Filter) filter);
+					if (filter.initialize(expression, m)) {
+						log("Filter #" + i + " (" + type + ") initialized");
+						this.masterFilter.addFilter((Filter) filter);
+					} else {
+						log("Configuration of filter #" + i + " is incorrect");
+					}
 				} catch (ClassNotFoundException e) {
-					log("Filter no." + i + " has incorrect type !");
+					log("Filter #" + i + " has incorrect type !");
 				} catch (Exception e) {
 					logException(e, "Filter type:" + type);
 				}
@@ -147,7 +158,7 @@ public class Main extends JavaPlugin {
 			this.Disable();
 			return;
 		} catch (IOException e) {
-			log("Cannot create a default config...");
+			logException(e, "Cannot create a default config...");
 			this.Disable();
 			return;
 		} catch (InvalidConfigurationException e) {

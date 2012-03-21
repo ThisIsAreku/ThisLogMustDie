@@ -6,16 +6,22 @@ import java.util.logging.LogRecord;
 
 import alexoft.tlmd.TlmdFilter;
 
-public class RegexFilter extends TlmdFilter implements Filter {
+public class AlterateFilter extends TlmdFilter implements Filter {
+	public enum AlterateType {
+		regex, level
+	}
+
+	//private AlterateType type = AlterateType.regex;
 	private String replace = "";
 
 	@Override
 	public boolean initialize(String expression, Map<?, ?> params) {
 		if (!super.initialize(expression, params))
 			return false;
-		if (this.getParams().containsKey("replace")) {
-			replace = this.getParams().get("replace").toString();
-		}
+		if (!this.getParams().containsKey("replace"))
+			return false;
+
+		replace = this.getParams().get("replace").toString();
 		return true;
 	}
 
@@ -23,11 +29,8 @@ public class RegexFilter extends TlmdFilter implements Filter {
 	public boolean isLoggable(LogRecord record) {
 		String m = record.getMessage();
 		if (m.matches(this.getExpression())) {
-			if ("".equals(replace)) {
-				record.setMessage(m.replaceAll(this.getExpression(), replace));
-			}
 			this.write(record);
-			return false;
+			record.setMessage(m.replaceAll(this.getExpression(), replace));
 		}
 		return true;
 	}

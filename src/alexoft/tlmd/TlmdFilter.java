@@ -12,8 +12,10 @@ public class TlmdFilter {
 	private Map<?, ?> params;
 	private File output;
 	private boolean logToFile = false;
+	private boolean disabled = false;
+	private MasterFilter parent;
 
-	public void initialize(String expression, Map<?, ?> params) {
+	public boolean initialize(String expression, Map<?, ?> params) {
 		this.expression = expression;
 		this.params = params;
 
@@ -33,7 +35,9 @@ public class TlmdFilter {
 			}
 		} catch (IOException e) {
 			e.printStackTrace();
+			return false;
 		}
+		return true;
 	}
 
 	public void setLogFile(File output) {
@@ -52,6 +56,7 @@ public class TlmdFilter {
 	}
 
 	public void write(LogRecord record) {
+		if(this.disabled) return;
 		if(!this.logToFile) return;
 		try {
 			FileWriter fstream = new FileWriter(this.output, true);
@@ -63,4 +68,18 @@ public class TlmdFilter {
 			e.printStackTrace();
 		}
 	}
+	
+	public void disableFilter(){
+		this.disabled = true;		
+	}
+	public boolean isDisabled(){
+		return this.disabled;
+	}
+	public MasterFilter getParent(){
+		return this.parent;
+	}
+	public void setParent(MasterFilter parent){
+		this.parent = parent;
+	}
+	
 }

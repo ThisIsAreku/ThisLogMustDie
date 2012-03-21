@@ -10,11 +10,12 @@ public class ExactFilter extends TlmdFilter implements Filter  {
 	private boolean caseSensitive;
 
 	@Override
-	public void initialize(String expression, Map<?, ?> params) {
-		super.initialize(expression, params);
+	public boolean initialize(String expression, Map<?, ?> params) {
+		if(!super.initialize(expression, params)) return false;
 		if(this.getParams().containsKey("case-sensitive")){
 			caseSensitive = Boolean.parseBoolean(this.getParams().get("case-sensitive").toString());
 		}
+		return true;
 	}
 
 	@Override
