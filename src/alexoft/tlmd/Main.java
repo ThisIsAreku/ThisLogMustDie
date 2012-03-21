@@ -56,13 +56,14 @@ public class Main extends JavaPlugin {
 				+ this.getDescription().getName().toUpperCase() + ", v"
 				+ p_version);
 		log("= " + this.getDescription().getWebsite() + " =");
-		
-        this.getCommand("tlmd").setExecutor(this);
-        
+
+		this.getCommand("tlmd").setExecutor(this);
+
 		this.masterFilter = new MasterFilter(this);
 		loadFilters();
 		initializeMasterFilter();
 		startMetrics();
+		startUpdate();
 	}
 
 	public void Disable() {
@@ -72,28 +73,31 @@ public class Main extends JavaPlugin {
 	}
 
 	@Override
-	public boolean onCommand(CommandSender cs, Command command,
-			String label, String[] args) {
+	public boolean onCommand(CommandSender cs, Command command, String label,
+			String[] args) {
 
-        if (!cs.isOp()) {
-            sendMessage(cs, ChatColor.RED + "You must be an OP to reload filters");
-            return true;
-        }
-        if((args.length == 0)||(args.length == 1 && "help".equals(args[0]))){
-            sendMessage(cs, ChatColor.YELLOW + "Usage: /tlmd reload");
-            return true;
-        }
+		if (!cs.isOp()) {
+			sendMessage(cs, ChatColor.RED
+					+ "You must be an OP to reload filters");
+			return true;
+		}
+		if ((args.length == 0) || (args.length == 1 && "help".equals(args[0]))) {
+			sendMessage(cs, ChatColor.YELLOW + "Usage: /tlmd reload");
+			return true;
+		}
 
-        if ("reload".equals(args[0])) {
-        	initializeMasterFilter();
-        	loadFilters();
-            sendMessage(cs, ChatColor.GREEN + (this.masterFilter.filterCount() + " filter(s) loaded"));
-        	return true;
-        }
+		if ("reload".equals(args[0])) {
+			initializeMasterFilter();
+			loadFilters();
+			sendMessage(cs, ChatColor.GREEN
+					+ (this.masterFilter.filterCount() + " filter(s) loaded"));
+			return true;
+		}
 		return super.onCommand(cs, command, label, args);
 	}
+
 	public void sendMessage(CommandSender cs, String m) {
-		cs.sendMessage("["+this.getName()+"] " + m);
+		cs.sendMessage("[" + this.getName() + "] " + m);
 	}
 
 	public void startMetrics() {
@@ -105,6 +109,12 @@ public class Main extends JavaPlugin {
 		} catch (IOException e) {
 			log("Cannot start Metrics...");
 		}
+	}
+
+	public void startUpdate() {
+		//log("Checking update");
+		UpdateChecker update = new UpdateChecker(this);
+		update.start();
 	}
 
 	public void initializeMasterFilter() {
