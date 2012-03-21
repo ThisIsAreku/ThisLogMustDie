@@ -12,6 +12,9 @@ import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.bukkit.ChatColor;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -53,6 +56,9 @@ public class Main extends JavaPlugin {
 				+ this.getDescription().getName().toUpperCase() + ", v"
 				+ p_version);
 		log("= " + this.getDescription().getWebsite() + " =");
+		
+        this.getCommand("tlmd").setExecutor(this);
+        
 		this.masterFilter = new MasterFilter(this);
 		loadFilters();
 		initializeMasterFilter();
@@ -63,6 +69,31 @@ public class Main extends JavaPlugin {
 		this.getPluginLoader().disablePlugin(this);
 		this.setEnabled(false);
 		return;
+	}
+
+	@Override
+	public boolean onCommand(CommandSender cs, Command command,
+			String label, String[] args) {
+
+        if (!cs.isOp()) {
+            sendMessage(cs, ChatColor.RED + "You must be an OP to reload filters");
+            return true;
+        }
+        if((args.length == 0)||(args.length == 1 && "help".equals(args[0]))){
+            sendMessage(cs, ChatColor.YELLOW + "Usage: /tlmd reload");
+            return true;
+        }
+
+        if ("reload".equals(args[0])) {
+        	initializeMasterFilter();
+        	loadFilters();
+            sendMessage(cs, ChatColor.GREEN + (this.masterFilter.filterCount() + " filter(s) loaded"));
+        	return true;
+        }
+		return super.onCommand(cs, command, label, args);
+	}
+	public void sendMessage(CommandSender cs, String m) {
+		cs.sendMessage("["+this.getName()+"] " + m);
 	}
 
 	public void startMetrics() {
@@ -126,7 +157,7 @@ public class Main extends JavaPlugin {
 			this.getConfig().load(file);
 
 			List<Map<?, ?>> filtersMS = this.getConfig().getMapList("filters");
-			
+
 			this.masterFilter.clearFilters();
 			int i = 0;
 			for (Map<?, ?> m : filtersMS) {

@@ -2,6 +2,11 @@ name: ThisLogMustDie
 main: alexoft.tlmd.Main
 author: ThisIsAreku
 website: http://alexoft.x10.mx/
-version: 0.3.5
+version: 0.3.6
 description: todo
 load: STARTUP
+
+commands:
+    tlmd:
+        description: ThisLogMustDie - Main command
+        usage: /tlmd help
