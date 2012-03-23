@@ -12,13 +12,14 @@ public class UpdateChecker implements Runnable {
 	private Main plugin;
 	private static final String UPDATE_YML_URL = "https://raw.github.com/ThisIsAreku/ThisLogMustDie/master/src/plugin.yml";
 	private static final String USER_UPDATE_URL = "http://dev.bukkit.org/server-mods/thislogmustdie/";
+	private static final long UPDATE_TIME = 86400;
 
 	public UpdateChecker(Main plugin) {
 		this.plugin = plugin;
 	}
 	
 	public void start(){
-		this.plugin.getServer().getScheduler().scheduleAsyncDelayedTask(this.plugin, this);
+		this.plugin.getServer().getScheduler().scheduleAsyncRepeatingTask(this.plugin, this, 1, UPDATE_TIME*20);
 	}
 
 	@Override
