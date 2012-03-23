@@ -1,0 +1,3 @@
+force-filter:
+  enable: true
+  interval: 20

@@ -16,6 +16,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -24,6 +25,9 @@ public class Main extends JavaPlugin {
 	public static String p_version;
 	public static String b_version;
 	public MasterFilter masterFilter;
+
+	public boolean force_filters = false;
+	public long force_filters_intv = 0;
 
 	public static void log(Level level, String m) {
 		l.log(level, m);
@@ -60,10 +64,18 @@ public class Main extends JavaPlugin {
 		this.getCommand("tlmd").setExecutor(this);
 
 		this.masterFilter = new MasterFilter(this);
+		loadConfig();
 		loadFilters();
 		initializeMasterFilter();
 		startMetrics();
 		startUpdate();
+		if(this.force_filters)
+			this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable(){
+				@Override
+				public void run() {
+					initializeMasterFilter();
+				}
+			}, 5, this.force_filters_intv*20);
 	}
 
 	public void Disable() {
@@ -112,7 +124,7 @@ public class Main extends JavaPlugin {
 	}
 
 	public void startUpdate() {
-		//log("Checking update");
+		// log("Checking update");
 		UpdateChecker update = new UpdateChecker(this);
 		update.start();
 	}
@@ -195,16 +207,51 @@ public class Main extends JavaPlugin {
 			}
 			log(this.masterFilter.filterCount() + " filter(s) loaded");
 		} catch (FileNotFoundException e) {
-			log("Cannot found the config...");
+			log("Cannot found the filter...");
 			this.Disable();
 			return;
 		} catch (IOException e) {
-			logException(e, "Cannot create a default config...");
+			logException(e, "Cannot create a default filters...");
 			this.Disable();
 			return;
 		} catch (InvalidConfigurationException e) {
 			e.printStackTrace();
-			log("Fill config before !");
+			log("Fill filters before !");
+			this.Disable();
+			return;
+		}
+	}
+
+	public void loadConfig() {
+		try {
+			File file = new File(this.getDataFolder(), "config.yml");
+			if (!this.getDataFolder().exists())
+				this.getDataFolder().mkdirs();
+			if (!file.exists())
+				copy(this.getResource("config.yml"), file);
+
+			this.getConfig().load(file);
+
+			YamlConfiguration defaults = new YamlConfiguration();
+			defaults.load(this.getResource("config.yml"));
+			this.getConfig().addDefaults(defaults);
+			this.getConfig().options().copyDefaults(true);
+
+			this.force_filters = this.getConfig().getBoolean("force-filter.enable");
+			this.force_filters_intv = this.getConfig().getLong("force-filter.interval");
+
+			this.getConfig().save(file);
+		} catch (FileNotFoundException e) {
+			log("Cannot found the filter...");
+			this.Disable();
+			return;
+		} catch (IOException e) {
+			logException(e, "Cannot create a default filters...");
+			this.Disable();
+			return;
+		} catch (InvalidConfigurationException e) {
+			e.printStackTrace();
+			log("Fill filters before !");
 			this.Disable();
 			return;
 		}
