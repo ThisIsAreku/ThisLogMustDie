@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Filter;
@@ -20,6 +21,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import alexoft.commons.UpdateChecker;
+
 public class Main extends JavaPlugin {
 	public static Logger l;
 	public static String p_version;
@@ -28,6 +31,8 @@ public class Main extends JavaPlugin {
 
 	public boolean force_filters = false;
 	public long force_filters_intv = 0;
+	public boolean summaryOnStart = true;
+	public boolean check_plugin_updates = true;
 
 	public static void log(Level level, String m) {
 		l.log(level, m);
@@ -64,18 +69,22 @@ public class Main extends JavaPlugin {
 		this.getCommand("tlmd").setExecutor(this);
 
 		this.masterFilter = new MasterFilter(this);
+
 		loadConfig();
 		loadFilters();
 		initializeMasterFilter();
 		startMetrics();
-		startUpdate();
-		if(this.force_filters)
-			this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable(){
-				@Override
-				public void run() {
-					initializeMasterFilter();
-				}
-			}, 5, this.force_filters_intv*20);
+		if (this.check_plugin_updates)
+			startUpdate();
+
+		if (this.force_filters)
+			this.getServer().getScheduler()
+					.scheduleSyncRepeatingTask(this, new Runnable() {
+						@Override
+						public void run() {
+							initializeMasterFilter();
+						}
+					}, 5, this.force_filters_intv * 20);
 	}
 
 	public void Disable() {
@@ -116,7 +125,23 @@ public class Main extends JavaPlugin {
 
 		try {
 			log("Starting Metrics");
-			MetricsLite metrics = new MetricsLite(this);
+			Metrics metrics = new Metrics(this);
+			metrics.addCustomData(new Metrics.Plotter("Filtered log messages") {
+
+				@Override
+				public int getValue() {
+					return masterFilter.FilteredLogCount();
+				}
+
+			});
+			metrics.addCustomData(new Metrics.Plotter("Altered log messages") {
+
+				@Override
+				public int getValue() {
+					return masterFilter.AlteredLogCount();
+				}
+
+			});
 			metrics.start();
 		} catch (IOException e) {
 			log("Cannot start Metrics...");
@@ -124,9 +149,12 @@ public class Main extends JavaPlugin {
 	}
 
 	public void startUpdate() {
-		// log("Checking update");
-		UpdateChecker update = new UpdateChecker(this);
-		update.start();
+		try {
+			UpdateChecker update = new UpdateChecker(this);
+			update.start();
+		} catch (MalformedURLException e) {
+			log("Cannot start Plugin Updater...");
+		}
 	}
 
 	public void initializeMasterFilter() {
@@ -194,7 +222,8 @@ public class Main extends JavaPlugin {
 					TlmdFilter filter = (TlmdFilter) Class.forName(
 							"alexoft.tlmd.filters." + type).newInstance();
 					if (filter.initialize(expression, m)) {
-						log("Filter #" + i + " (" + type + ") initialized");
+						if (this.summaryOnStart)
+							log("Filter #" + i + " (" + type + ") initialized");
 						this.masterFilter.addFilter((Filter) filter);
 					} else {
 						log("Configuration of filter #" + i + " is incorrect");
@@ -237,8 +266,14 @@ public class Main extends JavaPlugin {
 			this.getConfig().addDefaults(defaults);
 			this.getConfig().options().copyDefaults(true);
 
-			this.force_filters = this.getConfig().getBoolean("force-filter.enable");
-			this.force_filters_intv = this.getConfig().getLong("force-filter.interval");
+			this.force_filters = this.getConfig().getBoolean(
+					"force-filter.enable");
+			this.force_filters_intv = this.getConfig().getLong(
+					"force-filter.interval");
+			this.summaryOnStart = this.getConfig().getBoolean(
+					"summary-on-start");
+			this.check_plugin_updates = this.getConfig().getBoolean(
+					"check-plugin-updates");
 
 			this.getConfig().save(file);
 		} catch (FileNotFoundException e) {

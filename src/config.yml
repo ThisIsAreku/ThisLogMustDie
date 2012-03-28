@@ -1,3 +1,5 @@
 force-filter:
   enable: true
   interval: 20
+summary-on-start: true
+check-plugin-updates: true

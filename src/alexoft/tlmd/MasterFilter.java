@@ -11,6 +11,8 @@ import java.util.logging.LogRecord;
 public class MasterFilter implements Filter {
 	private List<Filter> filters;
 	private Main parent;
+	private int filteredLog = 0;
+	private int alteredLog = 0;
 
 	public MasterFilter(Main parent) {
 		this.parent = parent;
@@ -32,6 +34,20 @@ public class MasterFilter implements Filter {
 		this.filters.clear();
 	}
 
+	public int AlteredLogCount(){
+		return this.alteredLog;
+	}
+	public int FilteredLogCount(){
+		return this.filteredLog;
+	}
+	
+	public void incrementAlteredLogCount(){
+		this.alteredLog++;
+	}
+	public void incrementFilteredLogCount(){
+		this.filteredLog++;
+	}
+
 	@Override
 	public boolean isLoggable(LogRecord record) {
 		try {
@@ -43,6 +59,7 @@ public class MasterFilter implements Filter {
 				}
 				if (!f.isLoggable(record)) {
 					//writelog("Filter #" + i + " return false");
+					incrementFilteredLogCount();
 					return false;
 				}
 				//i++;

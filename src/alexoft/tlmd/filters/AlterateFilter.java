@@ -31,6 +31,7 @@ public class AlterateFilter extends TlmdFilter implements Filter {
 		if (m.matches(this.getExpression())) {
 			this.write(record);
 			record.setMessage(m.replaceAll(this.getExpression(), replace));
+			this.getParent().incrementAlteredLogCount();
 		}
 		return true;
 	}
