@@ -3,7 +3,7 @@ filters:
    expression: Can't keep up! Did the system time change, or is the server overloaded?
    
  - type: AlterateFilter
-   expression: '(.{0,16}) \[/([0-9.]*:[0-9]{2,4})\] logged in with entity id [0-9]{1,4} at \(\[(.+?)\] (.+?)\)'
+   expression: '(.{0,16}) \[/([0-9.]*:[0-9]{2,4})\] logged in with entity id [0-9]*? at \(\[(.+?)\] (.+?)\)'
    replace: '$1 logged in from $2 in world "$3"'
    log-to-file: logins.log
 
