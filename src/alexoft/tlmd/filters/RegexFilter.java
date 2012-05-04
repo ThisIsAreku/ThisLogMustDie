@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
 
+import org.bukkit.ChatColor;
+
 import alexoft.tlmd.TlmdFilter;
 
 public class RegexFilter extends TlmdFilter implements Filter {
@@ -24,9 +26,15 @@ public class RegexFilter extends TlmdFilter implements Filter {
 		String m = record.getMessage();
 		if (m.matches(this.getExpression())) {
 			if ("".equals(replace)) {
-				record.setMessage(m.replaceAll(this.getExpression(), replace));
+				String msg = ChatColor.translateAlternateColorCodes(COLOR_CODE,
+						m.replaceAll(this.getExpression(), replace));
+				if (!this.getParent().getParent().use_color_codes) {
+					msg = ChatColor.stripColor(msg);
+				}
+				record.setMessage(msg);
 			}
 			this.write(record);
+			this.getParent().incrementFilteredLogCount();
 			return false;
 		}
 		return true;

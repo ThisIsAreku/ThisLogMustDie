@@ -12,6 +12,7 @@ public class LevelFilter extends TlmdFilter  implements Filter  {
 		Level m = record.getLevel();
 		if(m.toString().equalsIgnoreCase(this.getExpression())){
 			this.write(record);
+			this.getParent().incrementFilteredLogCount();
 			return false;
 		}
 		return true;

@@ -24,11 +24,13 @@ public class PartialFilter extends TlmdFilter implements Filter  {
 		if(this.caseSensitive){
 			if(m.contains(this.getExpression())){
 				this.write(record);
+				this.getParent().incrementFilteredLogCount();
 				return false;
 			}
 		}else{
 			if(m.toUpperCase().contains(this.getExpression().toUpperCase())){
 				this.write(record);
+				this.getParent().incrementFilteredLogCount();
 				return false;
 			}		
 		}

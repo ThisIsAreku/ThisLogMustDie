@@ -33,6 +33,7 @@ public class Main extends JavaPlugin {
 	public long force_filters_intv = 0;
 	public boolean summaryOnStart = true;
 	public boolean check_plugin_updates = true;
+	public boolean use_color_codes = true;
 
 	public static void log(Level level, String m) {
 		l.log(level, m);
@@ -273,7 +274,10 @@ public class Main extends JavaPlugin {
 			this.summaryOnStart = this.getConfig().getBoolean(
 					"summary-on-start");
 			this.check_plugin_updates = this.getConfig().getBoolean(
-					"check-plugin-updates");
+					"check-plugin-updates");			
+
+			this.use_color_codes = this.getConfig().getBoolean(
+					"use-color-codes");
 
 			this.getConfig().save(file);
 		} catch (FileNotFoundException e) {

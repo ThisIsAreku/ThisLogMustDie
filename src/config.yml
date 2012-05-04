@@ -2,4 +2,5 @@ force-filter:
   enable: true
   interval: 20
 summary-on-start: true
+use-color-codes: true
 check-plugin-updates: true

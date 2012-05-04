@@ -29,6 +29,7 @@ public class ExactFilter extends TlmdFilter implements Filter  {
 		}else{
 			if(m.equalsIgnoreCase(this.getExpression())){
 				this.write(record);
+				this.getParent().incrementFilteredLogCount();
 				return false;
 			}		
 		}

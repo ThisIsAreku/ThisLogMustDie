@@ -18,6 +18,10 @@ public class MasterFilter implements Filter {
 		this.parent = parent;
 		this.filters = new ArrayList<Filter>();
 	}
+	
+	public Main getParent(){
+		return this.parent;
+	}
 
 	public void addFilter(Filter filter) {
 		((TlmdFilter)filter).setParent(this);
@@ -59,7 +63,6 @@ public class MasterFilter implements Filter {
 				}
 				if (!f.isLoggable(record)) {
 					//writelog("Filter #" + i + " return false");
-					incrementFilteredLogCount();
 					return false;
 				}
 				//i++;

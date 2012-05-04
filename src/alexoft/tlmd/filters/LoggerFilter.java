@@ -24,11 +24,13 @@ public class LoggerFilter extends TlmdFilter  implements Filter  {
 		if(this.caseSensitive){
 			if(m.equals(this.getExpression())){
 				this.write(record);
+				this.getParent().incrementFilteredLogCount();
 				return false;
 			}
 		}else{
 			if(m.equalsIgnoreCase(this.getExpression())){
 				this.write(record);
+				this.getParent().incrementFilteredLogCount();
 				return false;
 			}		
 		}
