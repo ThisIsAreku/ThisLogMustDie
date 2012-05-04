@@ -68,7 +68,9 @@ public class Main extends JavaPlugin {
 		log("= " + this.getDescription().getWebsite() + " =");
 
 		this.getCommand("tlmd").setExecutor(this);
-
+		
+		new ColorConverter(this);
+		
 		this.masterFilter = new MasterFilter(this);
 
 		loadConfig();

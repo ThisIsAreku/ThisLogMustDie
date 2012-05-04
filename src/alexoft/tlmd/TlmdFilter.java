@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.logging.LogRecord;
 
 public class TlmdFilter {
-	public static final char COLOR_CODE = '&';
 	private String expression;
 	private Map<?, ?> params;
 	private File output;
