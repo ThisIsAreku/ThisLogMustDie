@@ -13,6 +13,7 @@ import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -68,9 +69,9 @@ public class Main extends JavaPlugin {
 		log("= " + this.getDescription().getWebsite() + " =");
 
 		this.getCommand("tlmd").setExecutor(this);
-		
+
 		new ColorConverter(this);
-		
+
 		this.masterFilter = new MasterFilter(this);
 
 		loadConfig();
@@ -169,6 +170,7 @@ public class Main extends JavaPlugin {
 				// i++;
 			}
 			this.getServer().getLogger().setFilter(masterFilter);
+			Bukkit.getLogger().setFilter(masterFilter);
 			Logger.getLogger("Minecraft").setFilter(masterFilter);
 		} catch (Exception e) {
 			log(Level.INFO, "Cannot load filter in '" + pname
@@ -186,6 +188,7 @@ public class Main extends JavaPlugin {
 								p.getLogger().setFilter(masterFilter);
 							}
 							getServer().getLogger().setFilter(masterFilter);
+							Bukkit.getLogger().setFilter(masterFilter);
 							Logger.getLogger("Minecraft").setFilter(
 									masterFilter);
 						} catch (Exception e) {
@@ -276,7 +279,7 @@ public class Main extends JavaPlugin {
 			this.summaryOnStart = this.getConfig().getBoolean(
 					"summary-on-start");
 			this.check_plugin_updates = this.getConfig().getBoolean(
-					"check-plugin-updates");			
+					"check-plugin-updates");
 
 			this.use_color_codes = this.getConfig().getBoolean(
 					"use-color-codes");

@@ -10,6 +10,10 @@ filters:
  - type: AlterateFilter
    expression: '(.{0,16}) lost connection: (.*)'
    replace: 'Goodbye &b$1&f ! &e($2)'
+ 
+ - type: AlterateFilter
+   expression: 'Done (([0-9,]*?)s)! For help, type "help" or "?"'
+   replace: '&bServer Ready !&f (Loaded in &4$1s&f)'
    
  - type: ExactFilter
    expression: Connection reset
