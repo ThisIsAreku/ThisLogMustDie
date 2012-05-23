@@ -2,20 +2,20 @@ package alexoft.tlmd;
 
 import java.util.EnumMap;
 import java.util.Map;
-
 import org.bukkit.ChatColor;
 import org.fusesource.jansi.Ansi;
 import org.fusesource.jansi.Ansi.Attribute;
 
 public class ColorConverter {
-	public static final char ALT_COLOR_CODE = '&';
-	private static final Map<ChatColor, String> replacements = new EnumMap<ChatColor, String>(ChatColor.class);
-	private static Main plugin;
-	private static final ChatColor[] colors = ChatColor.values();
-	
-	public ColorConverter(Main plugin){
-		ColorConverter.plugin = plugin;
-		replacements.put(ChatColor.BLACK, Ansi.ansi().fg(Ansi.Color.BLACK).toString());
+
+    public static final char ALT_COLOR_CODE = '&';
+    private static final Map<ChatColor, String> replacements = new EnumMap<ChatColor, String>(ChatColor.class);
+    private static Main plugin;
+    private static final ChatColor[] colors = ChatColor.values();
+
+    public ColorConverter(Main plugin) {
+        ColorConverter.plugin = plugin;
+        replacements.put(ChatColor.BLACK, Ansi.ansi().fg(Ansi.Color.BLACK).toString());
         replacements.put(ChatColor.DARK_BLUE, Ansi.ansi().fg(Ansi.Color.BLUE).toString());
         replacements.put(ChatColor.DARK_GREEN, Ansi.ansi().fg(Ansi.Color.GREEN).toString());
         replacements.put(ChatColor.DARK_AQUA, Ansi.ansi().fg(Ansi.Color.CYAN).toString());
@@ -37,23 +37,23 @@ public class ColorConverter {
         replacements.put(ChatColor.UNDERLINE, Ansi.ansi().a(Attribute.UNDERLINE).toString());
         replacements.put(ChatColor.ITALIC, Ansi.ansi().a(Attribute.ITALIC).toString());
         replacements.put(ChatColor.RESET, Ansi.ansi().a(Attribute.RESET).fg(Ansi.Color.DEFAULT).toString());
-	}
-	
-	public static String convertColor(String m){
-		m = ChatColor.translateAlternateColorCodes(ALT_COLOR_CODE, m);
-		m = replaceColorCodes(m)+replacements.get(ChatColor.RESET);
-		if(!plugin.use_color_codes){
-			return ChatColor.stripColor(m);
-		}
-		return m;
-	}
-	
-	public static String stripColorCodes(String m){
-		return ChatColor.stripColor(m);
-	}
-	
-	private static String replaceColorCodes(String m){
-		String result = m;
+    }
+
+    public static String convertColor(String m) {
+        m = ChatColor.translateAlternateColorCodes(ALT_COLOR_CODE, m);
+        m = replaceColorCodes(m) + replacements.get(ChatColor.RESET);
+        if (!plugin.use_color_codes) {
+            return ChatColor.stripColor(m);
+        }
+        return m;
+    }
+
+    public static String stripColorCodes(String m) {
+        return ChatColor.stripColor(m);
+    }
+
+    private static String replaceColorCodes(String m) {
+        String result = m;
         for (ChatColor color : colors) {
             if (replacements.containsKey(color)) {
                 result = result.replaceAll("(?i)" + color.toString(), replacements.get(color));
@@ -62,5 +62,5 @@ public class ColorConverter {
             }
         }
         return result;
-	}
+    }
 }

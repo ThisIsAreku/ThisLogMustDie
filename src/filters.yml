@@ -12,7 +12,7 @@ filters:
    replace: 'Goodbye &b$1&f ! &e($2)'
  
  - type: AlterateFilter
-   expression: 'Done (([0-9,]*?)s)! For help, type "help" or "?"'
+   expression: 'Done \(([0-9,]+?)s\)! For help, type "help" or "\?"'
    replace: '&bServer Ready !&f (Loaded in &4$1s&f)'
    
  - type: ExactFilter
