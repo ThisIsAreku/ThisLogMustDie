@@ -41,11 +41,11 @@ public class ColorConverter {
 
     public static String convertColor(String m) {
         m = ChatColor.translateAlternateColorCodes(ALT_COLOR_CODE, m);
-        m = replaceColorCodes(m) + replacements.get(ChatColor.RESET);
-        if (!plugin.use_color_codes) {
+        if (plugin.use_color_codes) {
+            return replaceColorCodes(m) + replacements.get(ChatColor.RESET);
+        } else {
             return ChatColor.stripColor(m);
         }
-        return m;
     }
 
     public static String stripColorCodes(String m) {

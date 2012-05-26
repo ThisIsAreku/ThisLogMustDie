@@ -2,7 +2,7 @@ name: ThisLogMustDie
 main: alexoft.tlmd.Main
 author: ThisIsAreku
 website: http://alexoft.x10.mx/
-version: 0.4.3
+version: 0.4.4
 description: Format your console !
 load: STARTUP
 
