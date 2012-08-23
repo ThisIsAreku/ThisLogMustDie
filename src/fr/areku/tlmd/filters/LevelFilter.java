@@ -1,10 +1,11 @@
-package alexoft.tlmd.filters;
+package fr.areku.tlmd.filters;
 
 import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
-import alexoft.tlmd.TlmdFilter;
+import fr.areku.tlmd.TlmdFilter;
+
 
 public class LevelFilter extends TlmdFilter  implements Filter  {
 	@Override

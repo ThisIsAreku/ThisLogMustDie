@@ -1,4 +1,4 @@
-package alexoft.tlmd;
+package fr.areku.tlmd;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -39,10 +39,14 @@ public class MasterFilter implements Filter {
 	}
 
 	public int AlteredLogCount(){
-		return this.alteredLog;
+		int f  =this.alteredLog;
+		this.alteredLog = 0;
+		return f;
 	}
 	public int FilteredLogCount(){
-		return this.filteredLog;
+		int f  =this.filteredLog;
+		this.filteredLog = 0;
+		return f;
 	}
 	
 	public void incrementAlteredLogCount(){

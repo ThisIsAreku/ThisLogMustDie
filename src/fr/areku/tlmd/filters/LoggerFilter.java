@@ -1,12 +1,13 @@
-package alexoft.tlmd.filters;
+package fr.areku.tlmd.filters;
 
 import java.util.Map;
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
 
-import alexoft.tlmd.TlmdFilter;
+import fr.areku.tlmd.TlmdFilter;
 
-public class PartialFilter extends TlmdFilter implements Filter  {
+
+public class LoggerFilter extends TlmdFilter  implements Filter  {
 	private boolean caseSensitive;
 
 	@Override
@@ -17,18 +18,18 @@ public class PartialFilter extends TlmdFilter implements Filter  {
 		}
 		return true;
 	}
-
+	
 	@Override
 	public boolean isLoggable(LogRecord record) {
-		String m = record.getMessage().trim();
+		String m = record.getLoggerName();
 		if(this.caseSensitive){
-			if(m.contains(this.getExpression())){
+			if(m.equals(this.getExpression())){
 				this.write(record);
 				this.getParent().incrementFilteredLogCount();
 				return false;
 			}
 		}else{
-			if(m.toUpperCase().contains(this.getExpression().toUpperCase())){
+			if(m.equalsIgnoreCase(this.getExpression())){
 				this.write(record);
 				this.getParent().incrementFilteredLogCount();
 				return false;
@@ -36,6 +37,5 @@ public class PartialFilter extends TlmdFilter implements Filter  {
 		}
 		return true;
 	}
-
 
 }

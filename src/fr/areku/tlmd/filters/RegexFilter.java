@@ -1,11 +1,12 @@
-package alexoft.tlmd.filters;
+package fr.areku.tlmd.filters;
 
 import java.util.Map;
 import java.util.logging.Filter;
 import java.util.logging.LogRecord;
 
-import alexoft.tlmd.ColorConverter;
-import alexoft.tlmd.TlmdFilter;
+import fr.areku.tlmd.ColorConverter;
+import fr.areku.tlmd.TlmdFilter;
+
 
 public class RegexFilter extends TlmdFilter implements Filter {
 	private String replace = "";

@@ -1,4 +1,4 @@
-package alexoft.tlmd;
+package fr.areku.tlmd;
 
 import java.io.BufferedWriter;
 import java.io.File;

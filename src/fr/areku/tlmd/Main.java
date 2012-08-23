@@ -1,6 +1,6 @@
-package alexoft.tlmd;
+package fr.areku.tlmd;
 
-import alexoft.commons.UpdateChecker;
+import fr.areku.commons.UpdateChecker;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.util.List;
@@ -216,7 +216,7 @@ public class Main extends JavaPlugin {
                 String expression = m.get("expression").toString();
                 try {
                     TlmdFilter filter = (TlmdFilter) Class.forName(
-                            "alexoft.tlmd.filters." + type).newInstance();
+                            "fr.areku.tlmd.filters." + type).newInstance();
                     if (filter.initialize(expression, m)) {
                         if (this.summaryOnStart) {
                             log("Filter #" + i + " (" + type + ") initialized");
