@@ -1,8 +1,8 @@
 name: ThisLogMustDie
 main: fr.areku.tlmd.Main
 author: ThisIsAreku
-website: http://alexoft.x10.mx/
-version: 0.5
+website: http://areku.fr/
+version: 0.6
 description: Format your console !
 load: STARTUP
 
