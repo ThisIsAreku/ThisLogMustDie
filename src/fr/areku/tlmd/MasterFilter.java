@@ -37,6 +37,7 @@ public class MasterFilter implements Filter {
 		}
 		this.filters.clear();
 	}
+	
 
 	public int AlteredLogCount(){
 		int f  =this.alteredLog;

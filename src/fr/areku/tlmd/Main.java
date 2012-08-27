@@ -3,6 +3,7 @@ package fr.areku.tlmd;
 import fr.areku.commons.UpdateChecker;
 import java.io.*;
 import java.net.MalformedURLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Filter;
@@ -27,6 +28,7 @@ public class Main extends JavaPlugin {
     public boolean summaryOnStart = true;
     public boolean check_plugin_updates = true;
     public boolean use_color_codes = true;
+    public Map<String, Integer> filterCountMap = new HashMap<String, Integer>();
 
     public static void log(Level level, String m) {
         instance.getLogger().log(level, m);
@@ -51,14 +53,12 @@ public class Main extends JavaPlugin {
     }
 
     @Override
-    public void onEnable() {
+    public void onLoad() {
         instance = this;
         log("ThisIsAreku present "
                 + this.getDescription().getName().toUpperCase() + ", v"
                 + getDescription().getVersion());
         log("= " + this.getDescription().getWebsite() + " =");
-
-        this.getCommand("tlmd").setExecutor(this);
 
         new ColorConverter(this);
 
@@ -67,13 +67,9 @@ public class Main extends JavaPlugin {
         loadConfig();
         loadFilters();
         initializeMasterFilter();
-        startMetrics();
-        if (this.check_plugin_updates) {
-            startUpdate();
-        }
 
         if (this.force_filters) {
-            this.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
+            Bukkit.getServer().getScheduler().scheduleSyncRepeatingTask(this, new Runnable() {
 
                 @Override
                 public void run() {
@@ -82,6 +78,17 @@ public class Main extends JavaPlugin {
             }, 5, this.force_filters_intv * 20);
         }
     }
+
+    @Override
+    public void onEnable() {
+        this.getCommand("tlmd").setExecutor(this);
+        startMetrics();
+        if (this.check_plugin_updates) {
+            startUpdate();
+        }
+    }
+    
+    
 
     public void Disable() {
         this.getPluginLoader().disablePlugin(this);
@@ -121,20 +128,18 @@ public class Main extends JavaPlugin {
         try {
             log("Starting Metrics");
             Metrics metrics = new Metrics(this);
-            metrics.addCustomData(new Metrics.Plotter("Filtered log messages") {
+            Metrics.Graph fitersCount = metrics.createGraph("Number of filters");
+            for(final String name : filterCountMap.keySet()){
+            	fitersCount.addPlotter(new Metrics.Plotter(name){
 
-                @Override
-                public int getValue() {
-                    return masterFilter.FilteredLogCount();
-                }
-            });
-            metrics.addCustomData(new Metrics.Plotter("Altered log messages") {
-
-                @Override
-                public int getValue() {
-                    return masterFilter.AlteredLogCount();
-                }
-            });
+					@Override
+					public int getValue() {
+						//System.out.println("metrics:"+name+":"+filterCountMap.get(name));
+						return filterCountMap.get(name);
+					}
+            		
+            	});
+            }
             metrics.start();
         } catch (IOException e) {
             log("Cannot start Metrics...");
@@ -205,6 +210,7 @@ public class Main extends JavaPlugin {
             List<Map<?, ?>> filtersMS = this.getConfig().getMapList("filters");
 
             this.masterFilter.clearFilters();
+            this.filterCountMap.clear();
             int i = 0;
             for (Map<?, ?> m : filtersMS) {
                 i++;
@@ -221,6 +227,7 @@ public class Main extends JavaPlugin {
                         if (this.summaryOnStart) {
                             log("Filter #" + i + " (" + type + ") initialized");
                         }
+                        incrementFilterCount(type);
                         this.masterFilter.addFilter((Filter) filter);
                     } else {
                         log("Configuration of filter #" + i + " is incorrect");
@@ -242,6 +249,12 @@ public class Main extends JavaPlugin {
             logException(e, "Fill filters before !");
             this.Disable();
         }
+    }
+    private void incrementFilterCount(String name){
+    	if(!filterCountMap.containsKey(name))
+    		filterCountMap.put(name, 0);
+    	filterCountMap.put(name, filterCountMap.get(name)+1);
+    	//System.out.println("incrementFilterCount:"+name);
     }
 
     public void loadConfig() {

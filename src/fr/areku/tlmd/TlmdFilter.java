@@ -7,7 +7,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.logging.LogRecord;
 
-public class TlmdFilter {
+public abstract class TlmdFilter {
 	private String expression;
 	private Map<?, ?> params;
 	private File output;
