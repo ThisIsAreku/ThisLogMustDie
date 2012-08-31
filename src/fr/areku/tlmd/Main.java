@@ -286,10 +286,14 @@ public class Main extends JavaPlugin {
             this.use_color_codes = this.getConfig().getBoolean(
                     "use-color-codes");
             
+            try{
             if (!((CraftServer) getServer()).getReader().getTerminal().isAnsiSupported()) {
                 if (this.use_color_codes) {
                     log(Level.WARNING, "Color codes may not be supported by your system");
                 }
+            }
+            }catch(Exception e){
+            	//silent fail, when launched headless
             }
 
             this.getConfig().save(file);
