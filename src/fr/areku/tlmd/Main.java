@@ -1,7 +1,11 @@
 package fr.areku.tlmd;
 
-import fr.areku.commons.UpdateChecker;
-import java.io.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.List;
@@ -9,15 +13,17 @@ import java.util.Map;
 import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
-import org.bukkit.craftbukkit.CraftServer;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import fr.areku.commons.UpdateChecker;
 
 public class Main extends JavaPlugin {
 
@@ -286,7 +292,7 @@ public class Main extends JavaPlugin {
             this.use_color_codes = this.getConfig().getBoolean(
                     "use-color-codes");
             
-            try{
+           /* try{
             if (!((CraftServer) getServer()).getReader().getTerminal().isAnsiSupported()) {
                 if (this.use_color_codes) {
                     log(Level.WARNING, "Color codes may not be supported by your system");
@@ -294,7 +300,7 @@ public class Main extends JavaPlugin {
             }
             }catch(Exception e){
             	//silent fail, when launched headless
-            }
+            }*/
 
             this.getConfig().save(file);
         } catch (FileNotFoundException e) {

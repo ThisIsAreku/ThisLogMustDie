@@ -2,7 +2,7 @@ name: ThisLogMustDie
 main: fr.areku.tlmd.Main
 author: ThisIsAreku
 website: http://areku.fr/
-version: 0.7.1
+version: 0.7.2
 description: Format your console !
 load: STARTUP
 
