@@ -1,6 +1,11 @@
 force-filter:
-  enable: true
+  enable: false
   interval: 20
 summary-on-start: true
 use-color-codes: true
 check-plugin-updates: true
+separate-logs:
+  enable: false
+  directory: 'logs'
+  remove-colors-on-file: true
+  remove-from-main-file: false

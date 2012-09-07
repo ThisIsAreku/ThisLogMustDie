@@ -11,11 +11,10 @@ public class ColorConverter {
 	public static final char ALT_COLOR_CODE = '&';
 	private static final Map<ChatColor, String> replacements = new EnumMap<ChatColor, String>(
 			ChatColor.class);
-	private static Main plugin;
 	private static final ChatColor[] colors = ChatColor.values();
 
-	public ColorConverter(Main plugin) {
-		ColorConverter.plugin = plugin;
+	public static void initColorConverter() {
+		replacements.clear();
 		replacements.put(ChatColor.BLACK, Ansi.ansi().fg(Ansi.Color.BLACK)
 				.boldOff().toString());
 		replacements.put(ChatColor.DARK_BLUE, Ansi.ansi().fg(Ansi.Color.BLUE)
@@ -64,16 +63,37 @@ public class ColorConverter {
 	}
 
 	public static String convertColor(String m) {
+		if(replacements.size() == 0)
+			initColorConverter();
+		
 		m = ChatColor.translateAlternateColorCodes(ALT_COLOR_CODE, m);
-		if (plugin.use_color_codes) {
+		if (Config.use_color_codes) {
 			return replaceColorCodes(m) + replacements.get(ChatColor.RESET);
 		} else {
 			return ChatColor.stripColor(m);
 		}
 	}
+	
+	public static String getColorFromChatColor(ChatColor c){
+		return replacements.get(c);
+	}
 
 	public static String stripColorCodes(String m) {
-		return ChatColor.stripColor(m);
+		m =  ChatColor.stripColor(m);
+		return m;
+	}
+	
+	public static String stripASCIIColors(String m){
+		for(String s : replacements.values()){
+			m = m.replace(s, "");
+		}
+		return m;
+	}
+	
+	public static String StripAllColor(String m){
+		m = stripColorCodes(m);
+		m = stripASCIIColors(m);
+		return m;
 	}
 
 	private static String replaceColorCodes(String m) {
