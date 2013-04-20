@@ -23,6 +23,7 @@ import fr.areku.commons.UpdateChecker;
 
 public class Main extends JavaPlugin {
 
+	public final static String IGNORED_LOGGER = "passthru";
 	public static Main instance;
 	public MasterFilter masterFilter;
 	public Map<String, Integer> filterCountMap = new HashMap<String, Integer>();
@@ -50,6 +51,10 @@ public class Main extends JavaPlugin {
 		log(Level.SEVERE, "---------------------------------------");
 	}
 
+	public static final Logger getIgnoredLogger() {
+		return Logger.getLogger(IGNORED_LOGGER);
+	}
+
 	@Override
 	public void onLoad() {
 		instance = this;
@@ -58,10 +63,20 @@ public class Main extends JavaPlugin {
 				+ getDescription().getVersion());
 		log("= " + this.getDescription().getWebsite() + " =");
 		this.masterFilter = new MasterFilter();
-		
+
 		ColorConverter.initColorConverter();
 		Config.loadConfig();
 		loadFilters();
+	}
+
+	@Override
+	public void onEnable() {
+		this.getCommand("tlmd").setExecutor(this);
+		startMetrics();
+		if (Config.check_plugin_updates) {
+			startUpdate();
+		}
+
 		initializeMasterFilter();
 
 		if (Config.force_filters) {
@@ -74,20 +89,17 @@ public class Main extends JavaPlugin {
 						}
 					}, 5, Config.force_filters_intv * 20);
 		}
-	}
 
-	@Override
-	public void onEnable() {
-		this.getCommand("tlmd").setExecutor(this);
-		startMetrics();
-		if (Config.check_plugin_updates) {
-			startUpdate();
-		}
 	}
 
 	public void Disable() {
-		this.getPluginLoader().disablePlugin(this);
-		this.setEnabled(false);
+		Bukkit.getScheduler().cancelTasks(this);
+		try {
+			this.getPluginLoader().disablePlugin(this);
+			this.setEnabled(false);
+		} catch (Exception e) {
+
+		}
 	}
 
 	@Override
@@ -216,7 +228,9 @@ public class Main extends JavaPlugin {
 					log("Filter no." + i + " ignored");
 					continue;
 				}
-				String type = m.get("type").toString();
+				String type = bugfix_type(m.get("type").toString()); // fix
+																		// after
+																		// refatorization
 				String expression = m.get("expression").toString();
 				try {
 					TlmdFilter filter = (TlmdFilter) Class.forName(
@@ -254,5 +268,11 @@ public class Main extends JavaPlugin {
 			filterCountMap.put(name, 0);
 		filterCountMap.put(name, filterCountMap.get(name) + 1);
 		// System.out.println("incrementFilterCount:"+name);
+	}
+
+	private String bugfix_type(String t) {
+		if ("AlterateFilter".equals(t))
+			return "AlterationFilter";
+		return t;
 	}
 }

@@ -2,17 +2,17 @@ filters:
  - type: ExactFilter
    expression: Can't keep up! Did the system time change, or is the server overloaded?
    
- - type: AlterateFilter
+ - type: AlterationFilter
    expression: '(.{1,16})\[/([^\]]+?)\] logged in with entity id ([0-9]+?) at \(\[(.+?)\] (.+?)\)'
    replace: '&b$1&f logged in from &b$2&f in world &4"$4"&f (Entity #&b$3&f)'
    log-to-file: logins.log
 
- - type: AlterateFilter
+ - type: AlterationFilter
    expression: '(.{0,16}) lost connection: (.*)'
    replace: 'Goodbye &b$1&f ! &e($2)'
  
- - type: AlterateFilter
-   expression: 'Done \(([0-9,]+?)s\)! For help, type "help" or "\?"'
+ - type: AlterationFilter
+   expression: 'Done \(([0-9\.,]+?)s\)! For help, type "help" or "\?"'
    replace: '&bServer Ready !&f (Loaded in &4$1s&f)'
    
  - type: ExactFilter

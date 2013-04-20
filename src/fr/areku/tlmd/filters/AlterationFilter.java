@@ -8,8 +8,8 @@ import fr.areku.tlmd.ColorConverter;
 import fr.areku.tlmd.TlmdFilter;
 
 
-public class AlterateFilter extends TlmdFilter implements Filter {
-	public enum AlterateType {
+public class AlterationFilter extends TlmdFilter implements Filter {
+	public enum AlterationType {
 		regex, level
 	}
 

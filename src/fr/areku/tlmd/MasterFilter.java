@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.logging.Filter;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
-import java.util.logging.Logger;
 
 import org.bukkit.ChatColor;
 
@@ -75,7 +74,7 @@ public class MasterFilter implements Filter {
 				// i++;
 			}
 			if (Config.separate_logs) {
-				if (record.getLoggerName() == "")
+				if (Main.IGNORED_LOGGER.equals(record.getLoggerName()))
 					return true;
 
 				doLogSeparation(record);
@@ -89,7 +88,7 @@ public class MasterFilter implements Filter {
 									+ ColorConverter
 											.getColorFromChatColor(ChatColor.RESET);
 						}
-						Logger.getAnonymousLogger().log(
+						Main.getIgnoredLogger().log(
 								new LogRecord(Level.INFO, m));
 						initialized = true;
 					}
@@ -123,8 +122,12 @@ public class MasterFilter implements Filter {
 			if (!separateLogDir.exists())
 				separateLogDir.mkdirs();
 
-			File logFile = new File(separateLogDir, record.getLoggerName()
-					+ ".log");
+			String logName = record.getLoggerName();
+			if ("".equals(logName)) {
+				logName = "unknown";
+			}
+
+			File logFile = new File(separateLogDir, logName + ".log");
 			if (!logFile.exists())
 				logFile.createNewFile();
 
@@ -135,7 +138,7 @@ public class MasterFilter implements Filter {
 			out.newLine();
 			out.close();
 		} catch (Exception e) {
-			//e.printStackTrace();
+			// e.printStackTrace();
 		}
 
 	}

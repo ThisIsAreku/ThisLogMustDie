@@ -1,2 +1,2 @@
-update-yml-url: 'https://raw.github.com/ThisIsAreku/ThisLogMustDie/master/src/plugin.yml'
+update-raw-url: 'http://api.areku.fr/bukkit/ThisLogMustDie/version'
 message-update-url: 'http://dev.bukkit.org/server-mods/thislogmustdie/'
