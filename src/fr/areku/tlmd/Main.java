@@ -3,7 +3,6 @@ package fr.areku.tlmd;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -18,8 +17,6 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import fr.areku.commons.UpdateChecker;
 
 public class Main extends JavaPlugin {
 
@@ -80,9 +77,6 @@ public class Main extends JavaPlugin {
 	public void onEnable() {
 		this.getCommand("tlmd").setExecutor(this);
 		startMetrics();
-		if (Config.check_plugin_updates) {
-			startUpdate();
-		}
 	}
 
 	public void Disable() {
@@ -139,15 +133,6 @@ public class Main extends JavaPlugin {
 			metrics.start();
 		} catch (IOException e) {
 			log("Cannot start Metrics...");
-		}
-	}
-
-	public void startUpdate() {
-		try {
-			UpdateChecker update = new UpdateChecker(this);
-			update.start();
-		} catch (MalformedURLException e) {
-			log("Cannot start Plugin Updater...");
 		}
 	}
 
